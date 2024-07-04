@@ -4,6 +4,7 @@ import {
   Injectable,
   UnauthorizedException,
 } from "@nestjs/common";
+import * as jwt from 'jsonwebtoken';
 import { LoginDTO } from "src/interfaces/login.dto";
 import { RegisterDTO } from "src/interfaces/register.dto";
 import { UserI } from "src/interfaces/user.interface";
@@ -192,5 +193,9 @@ export class UsersService {
 
   async isEmailTaken(email: string): Promise<boolean> {
     return (await this.userRepository.find()).map((user: UserEntity) => user.email).includes(email);
+  }
+
+  async findUserByEmail(email: string): Promise<UserEntity> {
+    return this.userRepository.findOne({ where: { email }, select: ['firstName', 'lastName'] });
   }
 }

@@ -62,6 +62,11 @@ export class UsersController {
     return this.userService.findAllEmails();
   }
 
+  @Get(':email')
+  findUserByEmail(@Param('email') email: string): Promise<UserEntity> {
+    return this.userService.findUserByEmail(email);
+  }
+
   @Get('email/:email')
   isEmailTaken(@Param('email') email: string): Promise<boolean> {
     return this.userService.isEmailTaken(email);
