@@ -39,7 +39,9 @@ export class UsersService {
     const userPermissions = user.permissions ? user.permissions.map((p: PermissionEntity) => p.name) : [];
     const rolePermissions = user.roles ? user.roles.flatMap(role => role.permissions ? role.permissions.map((p: PermissionEntity) => p.name) : []) : [];
     const allPermissions = [...userPermissions, ...rolePermissions];
-    console.log(allPermissions);
+    console.log("Permisos del usuario:", userPermissions)
+    console.log("Permisos de los roles del usuario:", rolePermissions)
+    console.log("Todos los permisos del usuario:", allPermissions);
     const result: boolean = allPermissions.includes(permission);
     console.log(result);
     if (!result) {
@@ -120,16 +122,23 @@ export class UsersService {
     emailUser: string,
     permissionId: number
   ): Promise<HttpException> {
+    console.log("Se ingresó al método assignPermission")
     const permission = await this.permissionRepository.findOneBy({
       id: permissionId,
     });
+    console.log("El permiso que se desea asignar es: ", permission)
     if (!permission) {
       throw new HttpException("Permission not found", 404);
     } else {
-      const user = await this.userRepository.findOneBy({ email: emailUser });
+      const user = await this.userRepository.findOne({
+        where: { email: emailUser },
+        relations: ["permissions", "roles", "roles.permissions"],
+      });
+      console.log("El usuario al que se le desea asignar el permiso es: ", user)
       if (!user) {
         throw new HttpException("User not found", 404);
       } else {
+        console.log(user.permissions)
         if (!user.permissions) {
           user.permissions = [];
         }
